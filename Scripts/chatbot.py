@@ -13,8 +13,8 @@ def get_retriever(embedding_model, index_path="faiss_index"):
     vectorstore = load_faiss_index(embedding_model, index_path)
     
     # Transformer la base de données en un "retriever"
-    # search_kwargs={'k': 5} signifie qu'on récupérera les 5 chunks les plus pertinents.
-    return vectorstore.as_retriever(search_kwargs={'k': 5})
+    # search_kwargs={'k': 3} signifie qu'on récupérera les 3 chunks les plus pertinents.
+    return vectorstore.as_retriever(search_kwargs={'k': 3})
 
 
 def create_prompt_template():
