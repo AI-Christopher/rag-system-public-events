@@ -5,7 +5,7 @@ from langchain_mistralai.chat_models import ChatMistralAI
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-def get_retriever(embedding_model, index_path="faiss_index"):
+def get_retriever(embedding_model, index_path="data/faiss_index"):
     """
     Crée et retourne un retriever à partir d'un index FAISS existant.
     """

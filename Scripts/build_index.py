@@ -1,7 +1,7 @@
-from data_loader import fetch_events
-from processing import list_to_df, clean_df, filter_and_dedup, create_chunks_with_metadata
-from embedding import get_embed_texts, get_embedding_model
-from faiss_manager import create_faiss_index_from_vectors
+from src.core.data_loader import fetch_events
+from src.core.processing import list_to_df, clean_df, filter_and_dedup, create_chunks_with_metadata
+from src.core.embedding import get_embed_texts, get_embedding_model
+from src.core.faiss_manager import create_faiss_index_from_vectors
 
 if __name__ == "__main__":
 

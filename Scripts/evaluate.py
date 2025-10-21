@@ -10,8 +10,8 @@ from ragas.metrics import (
 )
 
 # Importer les fonctions de votre chatbot
-from chatbot import create_rag_chain, get_retriever
-from embedding import get_embedding_model
+from src.core.chatbot import create_rag_chain, get_retriever, create_prompt_template
+from src.core.embedding import get_embedding_model
 from langchain_mistralai.chat_models import ChatMistralAI
 
 def run_ragas_evaluation():
@@ -20,7 +20,7 @@ def run_ragas_evaluation():
     # --- 1. Préparation de la chaîne RAG ---
     embedding_model = get_embedding_model()
     retriever = get_retriever(embedding_model)
-    from chatbot import create_prompt_template # Assurez-vous que cette fonction est importable
+    #from chatbot import create_prompt_template # Assurez-vous que cette fonction est importable
     prompt = create_prompt_template()
     rag_chain = create_rag_chain(retriever, prompt, embedding_model)
 

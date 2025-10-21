@@ -31,7 +31,7 @@ def create_faiss_index_from_vectors(
     return vectorstore
 
 
-def load_faiss_index(embedding_model, index_path: str = "faiss_index", allow_dangerous: bool = True):
+def load_faiss_index(embedding_model, index_path: str = "data/faiss_index", allow_dangerous: bool = True):
     """Charge un index FAISS depuis le disque."""
     print(f"\nChargement de l'index FAISS depuis : {index_path}")
     # Le paramètre 'allow_dangerous_deserialization' est requis par les versions récentes de LangChain
