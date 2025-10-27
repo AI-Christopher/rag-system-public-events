@@ -8,6 +8,7 @@ dependencies = [
     "beautifulsoup4>=4.14.2",
     "dotenv>=0.9.9",
     "faiss-cpu>=1.12.0",
+    "fastapi>=0.120.0",
     "langchain>=0.3.27",
     "langchain-community>=0.3.31",
     "langchain-mistralai>=0.2.12",
@@ -17,6 +18,7 @@ dependencies = [
     "pytest-mock>=3.15.1",
     "ragas>=0.3.7",
     "requests>=2.32.5",
+    "uvicorn[standard]>=0.38.0",
 ]
 
 [tool.setuptools]
