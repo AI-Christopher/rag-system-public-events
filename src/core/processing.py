@@ -1,7 +1,7 @@
 import re
 import warnings
 import pandas as pd
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
