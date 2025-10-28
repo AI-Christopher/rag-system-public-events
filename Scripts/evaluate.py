@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 from datasets import Dataset
 from ragas import evaluate
@@ -93,6 +94,29 @@ def run_ragas_evaluation():
     # Afficher les résultats sous forme de tableau
     df_results = result.to_pandas()
     print(df_results)
+
+    # --- VÉRIFICATION DES SEUILS ---
+    
+    # 1. Définir vos seuils de qualité minimum
+    MIN_FAITHFULNESS = 0.8  # 80% de fidélité
+    MIN_CONTEXT_PRECISION = 0.5 # 50% de précision
+    
+    # 2. Calculer les scores moyens
+    mean_faithfulness = df_results['faithfulness'].mean()
+    mean_context_precision = df_results['context_precision'].mean()
+    
+    print(f"\n--- Vérification de la qualité ---")
+    print(f"Fidélité (Faithfulness): {mean_faithfulness:.2f} (Seuil: {MIN_FAITHFULNESS})")
+    print(f"Précision du Contexte: {mean_context_precision:.2f} (Seuil: {MIN_CONTEXT_PRECISION})")
+    
+    # 3. Vérifier si les seuils sont atteints
+    if mean_faithfulness < MIN_FAITHFULNESS or mean_context_precision < MIN_CONTEXT_PRECISION:
+        print("\nERREUR : Les scores d'évaluation sont insuffisants !")
+        print("Le build Docker sera annulé.")
+        sys.exit(1) # <-- C'est la ligne qui dit à GitHub Actions que le step a échoué !
+    else:
+        print("\nSUCCÈS : Les scores d'évaluation sont bons. Poursuite du build.")
+        # Le script se termine normalement (code 0)
 
 
 if __name__ == '__main__':

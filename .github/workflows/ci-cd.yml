@@ -1,0 +1,68 @@
+name: CI/CD - Tester, Évaluer et Publier l'API RAG
+
+on:
+    # Déclencher ce workflow à chaque push sur la branche 'main'
+    push:
+        branches: [ "main" ]
+    # Permet aussi de le lancer manuellement depuis l'onglet "Actions"
+    workflow_dispatch:
+
+jobs:
+    test-and-build:
+        # Utiliser un serveur Linux pour le build
+        runs-on: ubuntu-latest
+
+        # Donner la permission au job d'écrire sur le GitHub Container Registry
+        permissions:
+            contents: read
+            packages: write
+        
+        steps:
+            # --- 1. CONFIGURATION ---
+            - name: Récupérer le code
+              uses: actions/checkout@v4
+            
+            - name: Configurer Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.12'
+            
+            - name: Installer uv
+              run: pip install uv
+        
+            - name: Installer les dépendances
+              run: uv sync --system
+
+            # --- 2. TESTS UNITAIRES (CI) ---
+            - name: Lancer les tests unitaires
+              run: pytest
+
+            # --- 3. BUILD & EVALUATION (CI) ---
+            - name: Construire l'index FAISS
+              # Cette étape utilise la clé API pour l'embedding
+              run: python scripts/build_index.py
+              env:
+                MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+            
+            - name: Lancer l'évaluation Ragas
+            # Cette étape utilise aussi la clé pour l'évaluation
+              run: python scripts/evaluate.py
+              env:
+                MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+            
+            # --- 4. BUILD & PUBLICATION DOCKER (CD) ---
+            - name: Se connecter au GitHub Container Registry (GHCR)
+              uses: docker/login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }} # Votre nom d'utilisateur GitHub
+                password: ${{ secrets.GITHUB_TOKEN }} # Un token généré automatiquement
+
+            - name: Construire et Pousser l'image Docker
+              uses: docker/build-push-action@v5
+              with:
+                context: .
+                file: ./Dockerfile
+                push: true # Pousser l'image vers le registry
+                tags: ghcr.io/${{ github.repository }}:latest 
+                # ghcr.io/votre-nom/votre-projet:latest
