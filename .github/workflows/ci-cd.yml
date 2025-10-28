@@ -35,6 +35,8 @@ jobs:
 
             # --- 2. TESTS UNITAIRES (CI) ---
             - name: Lancer les tests unitaires
+              env:
+                PYTHONPATH: .
               run: pytest
 
             # --- 3. BUILD & EVALUATION (CI) ---

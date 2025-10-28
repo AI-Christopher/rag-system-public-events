@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-import re
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+#import re
+#from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.core.processing import clean_df, filter_and_dedup, create_chunks_with_metadata
 
 @pytest.fixture
