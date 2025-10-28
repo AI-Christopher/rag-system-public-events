@@ -31,7 +31,7 @@ jobs:
               run: pip install uv
         
             - name: Installer les dépendances
-              run: uv sync --system
+              run: uv sync
 
             # --- 2. TESTS UNITAIRES (CI) ---
             - name: Lancer les tests unitaires
