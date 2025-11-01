@@ -11,6 +11,10 @@ jobs:
     test-and-build:
         # Utiliser un serveur Linux pour le build
         runs-on: ubuntu-latest
+
+        defaults:
+          run:
+            working-directory: RAG_System_Public_Events
         
         # Donner la permission au job d'écrire sur le GitHub Container Registry
         permissions:
@@ -21,8 +25,6 @@ jobs:
             # --- 1. CONFIGURATION ---
             - name: Récupérer le code
               uses: actions/checkout@v4
-              with:
-                path: .
 
             - name: Configurer Python
               uses: actions/setup-python@v5
