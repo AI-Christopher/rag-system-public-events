@@ -23,3 +23,10 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["src"]
+
+
+[tool.pytest.ini_options]
+# On dit à pytest d'ignorer cet avertissement spécifique
+filterwarnings = [
+    "ignore:The input passed in on this line looks more like a URL:bs4.MarkupResemblesLocatorWarning"
+]

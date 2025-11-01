@@ -44,7 +44,7 @@ def create_rag_chain(retriever, prompt, embedding_model):
     """
     # Initialiser le modèle de chat Mistral
     llm = ChatMistralAI(
-        model="mistral-large-latest",
+        model="open-mistral-7b",
         temperature=0.1, # Peu de créativité pour s'en tenir aux faits
         api_key=embedding_model.mistral_api_key # On réutilise la clé
     )

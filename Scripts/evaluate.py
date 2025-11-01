@@ -73,7 +73,7 @@ def run_ragas_evaluation():
         raise ValueError("La clé API MISTRAL_API_KEY est nécessaire pour le juge.")
 
     # On définit explicitement le modèle Mistral comme juge
-    mistral_judge = ChatMistralAI(model="mistral-small-latest", temperature=0, api_key=api_key)
+    mistral_judge = ChatMistralAI(model="open-mistral-7b", temperature=0, api_key=api_key)
     mistral_embeddings = get_embedding_model()
     
     result = evaluate(

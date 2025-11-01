@@ -1,9 +1,7 @@
 import re
-import warnings
 import pandas as pd
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
-warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
+from bs4 import BeautifulSoup
 
 
 def list_to_df(events: list) -> pd.DataFrame:
