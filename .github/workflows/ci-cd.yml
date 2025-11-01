@@ -33,12 +33,12 @@ jobs:
               run: pip install uv
         
             - name: Installer les dépendances
-              working-directory: .
+              working-directory: RAG_System_Public_Events
               run: uv pip install --system .
 
             # --- 2. TESTS UNITAIRES (CI) ---
             - name: Lancer les tests unitaires
-              working-directory: .
+              working-directory: RAG_System_Public_Events
               env:
                 PYTHONPATH: .
                 MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -46,14 +46,14 @@ jobs:
 
             # --- 3. BUILD & EVALUATION (CI) ---
             - name: Construire l'index FAISS
-              working-directory: .
+              working-directory: RAG_System_Public_Events
               # Cette étape utilise la clé API pour l'embedding
               run: python scripts/build_index.py
               env:
                 MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
             
             - name: Lancer l'évaluation Ragas
-              working-directory: .
+              working-directory: RAG_System_Public_Events
             # Cette étape utilise aussi la clé pour l'évaluation
               run: python scripts/evaluate.py
               env:
