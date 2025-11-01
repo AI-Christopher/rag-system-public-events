@@ -11,7 +11,11 @@ jobs:
     test-and-build:
         # Utiliser un serveur Linux pour le build
         runs-on: ubuntu-latest
-
+        
+        defaults:
+          run:
+            working-directory: ./RAG_System_Public_Events
+        
         # Donner la permission au job d'écrire sur le GitHub Container Registry
         permissions:
             contents: read
