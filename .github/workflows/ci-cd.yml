@@ -12,10 +12,6 @@ jobs:
         # Utiliser un serveur Linux pour le build
         runs-on: ubuntu-latest
 
-        defaults:
-          run:
-            working-directory: RAG_System_Public_Events
-        
         # Donner la permission au job d'écrire sur le GitHub Container Registry
         permissions:
             contents: read
@@ -35,10 +31,12 @@ jobs:
               run: pip install uv
         
             - name: Installer les dépendances
+              working-directory: RAG_System_Public_Events
               run: uv pip install --system .
 
             # --- 2. TESTS UNITAIRES (CI) ---
             - name: Lancer les tests unitaires
+              working-directory: RAG_System_Public_Events
               env:
                 PYTHONPATH: .
                 MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -46,12 +44,14 @@ jobs:
 
             # --- 3. BUILD & EVALUATION (CI) ---
             - name: Construire l'index FAISS
+              working-directory: RAG_System_Public_Events
               # Cette étape utilise la clé API pour l'embedding
               run: python scripts/build_index.py
               env:
                 MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
             
             - name: Lancer l'évaluation Ragas
+              working-directory: RAG_System_Public_Events
             # Cette étape utilise aussi la clé pour l'évaluation
               run: python scripts/evaluate.py
               env:
@@ -68,8 +68,8 @@ jobs:
             - name: Construire et Pousser l'image Docker
               uses: docker/build-push-action@v5
               with:
-                context: .
-                file: ./Dockerfile
+                context: ./RAG_System_Public_Events
+                file: ./RAG_System_Public_Events/Dockerfile
                 push: true # Pousser l'image vers le registry
                 tags: ghcr.io/${{ github.repository }}:latest 
                 # ghcr.io/votre-nom/votre-projet:latest
