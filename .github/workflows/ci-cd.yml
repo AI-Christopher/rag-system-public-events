@@ -37,6 +37,7 @@ jobs:
             - name: Lancer les tests unitaires
               env:
                 PYTHONPATH: .
+                MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
               run: pytest
 
             # --- 3. BUILD & EVALUATION (CI) ---
