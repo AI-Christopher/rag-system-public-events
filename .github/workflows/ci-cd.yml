@@ -48,6 +48,7 @@ jobs:
               # Cette étape utilise la clé API pour l'embedding
               run: python Scripts/build_index.py
               env:
+                PYTHONPATH: .
                 MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
             
             - name: Lancer l'évaluation Ragas
@@ -55,6 +56,7 @@ jobs:
             # Cette étape utilise aussi la clé pour l'évaluation
               run: python Scripts/evaluate.py
               env:
+                PYTHONPATH: .
                 MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
             
             # --- 4. BUILD & PUBLICATION DOCKER (CD) ---
