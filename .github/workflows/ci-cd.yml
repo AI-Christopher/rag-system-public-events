@@ -73,5 +73,5 @@ jobs:
                 context: .
                 file: ./Dockerfile
                 push: true
-                tags: ghcr.io/${{ toLower(github.repository) }}:latest
+                tags: ghcr.io/${{ toLowerCase(github.repository) }}:latest
                 # ghcr.io/votre-nom/votre-projet:latest
