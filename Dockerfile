@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir uv && \
     uv pip install --system .
 
 # ---- Commande de démarrage ----
-CMD ["python", "src/api/main.py"]
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
