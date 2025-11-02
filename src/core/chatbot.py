@@ -14,7 +14,7 @@ def get_retriever(embedding_model, index_path="data/faiss_index"):
     
     # Transformer la base de données en un "retriever"
     # search_kwargs={'k': 3} signifie qu'on récupérera les 3 chunks les plus pertinents.
-    return vectorstore.as_retriever(search_kwargs={'k': 3})
+    return vectorstore.as_retriever(search_kwargs={'k': 5})
 
 
 def create_prompt_template():
