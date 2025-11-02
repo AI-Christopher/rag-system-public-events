@@ -66,6 +66,11 @@ jobs:
                 registry: ghcr.io
                 username: ${{ github.actor }} # Votre nom d'utilisateur GitHub
                 password: ${{ secrets.GITHUB_TOKEN }} # Un token généré automatiquement
+            
+            - name: Définir le tag d'image en minuscules
+              id: vars
+              run: |
+                echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
             - name: Construire et Pousser l'image Docker
               uses: docker/build-push-action@v5
@@ -73,5 +78,13 @@ jobs:
                 context: .
                 file: ./Dockerfile
                 push: true
-                tags: ghcr.io/${{ toLowerCase(github.repository) }}:latest
-                # ghcr.io/votre-nom/votre-projet:latest
+                tags: ghcr.io/${{ env.IMAGE_NAME }}:latest
+
+            # - name: Construire et Pousser l'image Docker
+            #   uses: docker/build-push-action@v5
+            #   with:
+            #     context: .
+            #     file: ./Dockerfile
+            #     push: true
+            #     tags: ghcr.io/${{ toLowerCase(github.repository) }}:latest
+            #     # ghcr.io/votre-nom/votre-projet:latest
