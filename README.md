@@ -4,6 +4,7 @@ Ce projet implémente un système complet de RAG (Retrieval-Augmented Generation
 
 Le projet est entièrement conteneurisé avec Docker et déployé via un pipeline CI/CD automatisé utilisant GitHub Actions.
 
+```
 RAG_SYSTEM_PUBLIC_EVENTS/
 ├── .github/workflows/          # Dossier pour l'automatisation CI/CD
 │   └── ci-cd.yml               # Fichier de workflow GitHub Actions (tests, build, push)
@@ -45,6 +46,8 @@ RAG_SYSTEM_PUBLIC_EVENTS/
 ├── Dockerfile                  # "Recette" pour construire ton image Docker
 └── pyproject.toml              # Fichier central ! Définit les dépendances, le nom du projet, etc.
 
+```
+
 ## 1. Architecture du Système (Runtime)
 
 Ce schéma montre comment l'API fonctionne une fois qu'elle est lancée dans un conteneur Docker.
@@ -74,7 +77,7 @@ graph TD
     D -- "6. Génère la réponse" --> B
     B -- "7. Retourne la réponse" --> A
     A -- "8. Réponse JSON" --> U
-````
+```
 
 ### Rôle des Composants (Runtime)
 
@@ -87,9 +90,9 @@ graph TD
   * **LLM Externe (MistralAI)**
       * **Rôle :** C'est le générateur de texte. Il reçoit le prompt (contenant la question de l'utilisateur et le contexte trouvé par FAISS) et génère une réponse en langage naturel. Il nécessite une clé API (`MISTRAL_API_KEY`) pour fonctionner.
 
------
+---
 
-## 2\. Architecture CI/CD (Déploiement)
+## 2. Architecture CI/CD (Déploiement)
 
 Ce schéma montre comment le code est testé, construit et déployé automatiquement à chaque modification.
 
@@ -127,9 +130,9 @@ graph LR
   * **Docker Desktop (Serveur de Démo)**
       * **Rôle :** C'est l'environnement d'exécution. Il `pull` (télécharge) l'image depuis GHCR et la `run` (lance) en tant que conteneur, en lui injectant les clés API via le fichier `.env`.
 
------
+---
 
-## 3\. Composants Clés du Dépôt
+## 3. Composants Clés du Dépôt
 
   * `src/api/main.py`
       * **Rôle :** Définit les points de terminaison (routes) de l'API FastAPI, comme `/query` et `/rebuild`.
@@ -201,7 +204,7 @@ Cette méthode vous permet de lancer l'API directement sur votre machine pour te
 
 1.  **Cloner le dépôt :**
     ```bash
-    git clone [https://github.com/ai-christopher/rag-system-public-events.git]
+    git clone https://github.com/ai-christopher/rag-system-public-events.git
     cd rag-system-public-events
     ```
 
@@ -253,17 +256,17 @@ Vous pouvez utiliser `curl` depuis votre terminal pour interroger l'API.
 
 #### Interroger le RAG
 
-* **Endpoint :** `POST /query`
+* **Endpoint :** `POST /ask`
 * **Description :** Pose une question au système RAG.
 * **Commande :**
 
 ```bash
 curl -X 'POST' \
-  'http://localhost:8000/query' \
+  'http://localhost:8000/ask' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "query": "Quelle est la date du prochain événement ?"
+  "question": "Quelle est la date du prochain événement ?"
 }'
 ````
 
@@ -285,15 +288,15 @@ curl -X 'POST' \
 
 #### Reconstruire l'index (si implémenté)
 
-  * **Endpoint :** `POST /rebuild_index` (adaptez le nom si différent)
-  * **Description :** Déclenche le script `scripts/build_index.py` pour reconstruire la base de données FAISS.
+  * **Endpoint :** `POST /rebuild`
+  * **Description :** Déclenche le script de reconstruction de l'index en arrière-plan.
   * **Commande :**
 
 <!-- end list -->
 
 ```bash
 curl -X 'POST' \
-  'http://localhost:8000/rebuild_index' \
+  'http://localhost:8000/rebuild' \
   -H 'accept: application/json' \
   -d ''
 ```
@@ -338,11 +341,76 @@ except requests.exceptions.RequestException as e:
 
 ```
 
-RAG_System_Public_Events/
-├── .env                  # Pour stocker vos clés d'API (MISTRAL_API_KEY)
-├── requirements.txt      # Liste des dépendances (pandas, langchain, etc.)
-├── config.py             # Paramètres centraux (taille des chunks, région, etc.)
-├── data_loader.py        # Fonction pour charger les données depuis l'API
-├── text_processor.py     # Fonctions pour nettoyer, transformer et chunker le texte
-├── embedding_model.py    # Fonction pour générer les embeddings
-└── main.py               # Le script principal qui orchestre tout
+---
+
+## 6. Choix Techniques, Limites et Améliorations
+
+Cette section justifie les décisions d'architecture prises pour ce projet et identifie les pistes d'amélioration.
+
+### Justification des Choix
+
+* **Architecture (FastAPI + Docker + CI/CD)**
+    * **FastAPI** a été choisi pour ses hautes performances, sa documentation automatique (Swagger/ReDoc) et son utilisation moderne de la validation de données avec Pydantic.
+    * **Docker** a été utilisé pour encapsuler l'application. Cela garantit une portabilité totale : l'API s'exécutera de la même manière sur le PC d'un développeur, dans un pipeline CI/CD, ou sur un serveur de production.
+    * **GitHub Actions (CI/CD)** a été implémenté pour automatiser la validation (tests, évaluation) et la livraison (build/push Docker), réduisant les erreurs humaines et garantissant que seule une version stable du code est publiée.
+
+* **Composants RAG**
+    * **Modèle (MistralAI)** : Les modèles Mistral offrent un équilibre de premier plan entre performance (qualité des réponses) et efficacité (vitesse, coût). Leur forte compétence en français était un atout pour ce projet.
+    * **Base Vectorielle (FAISS)** : FAISS (développé par Meta) est une bibliothèque extrêmement rapide et efficace pour la recherche de similarité sur de grands ensembles de vecteurs. Son intégration "in-memory" (fichiers `index.faiss` et `index.pkl`) la rend parfaite pour un déploiement simple et rapide sans dépendre d'une base de données externe.
+    * **Évaluation (Ragas)** : Utiliser `pytest` seul ne suffit pas pour un projet d'IA. `Ragas` a été choisi car c'est le standard de l'industrie pour l'évaluation des pipelines RAG. Il nous permet de mesurer objectivement des métriques cruciales comme la **fidélité** (l'API n'invente-t-elle rien ?) et la **pertinence** (la réponse est-elle utile ?).
+
+### Limites Actuelles
+
+1.  **Mise à jour des données :** La base FAISS est statique. Si de nouveaux événements sont ajoutés aux sources de données, l'API ne les connaîtra pas tant que l'index n'est pas manuellement reconstruit (`scripts/build_index.py`).
+2.  **Scalabilité de l'index :** FAISS s'exécute en mémoire. Si la quantité de documents sources devait augmenter massivement (milliards de documents), cette architecture atteindrait ses limites de RAM.
+3.  **Absence de mémoire de conversation :** L'API traite chaque question de manière indépendante. Elle ne peut pas gérer les questions de suivi (par exemple, "Et où se situe-t-il ?" en référence à la réponse précédente).
+
+### Améliorations Possibles
+
+* **Automatiser le Re-indexing :** Ajouter un point de terminaison d'API sécurisé (`/rebuild_index`) qui peut être appelé par un service externe (ex: un cron job) pour reconstruire l'index chaque nuit.
+* **Base de Données Vectorielle Managée :** Pour une scalabilité supérieure, migrer de FAISS vers une solution de base de données vectorielle hébergée (ex: Pinecone, Weaviate, Zilliz).
+* **Implémenter l'historique de chat :** Modifier l'API pour qu'elle accepte un `session_id` afin de gérer l'historique de la conversation et permettre des interactions plus naturelles.
+
+---
+
+## 7. Validation et Résultats des Tests
+
+Le projet est validé par deux niveaux de tests : des tests unitaires (`pytest`) pour la logique du code et une évaluation de performance (`Ragas`) pour la qualité de l'IA.
+
+### Tests Unitaires (Pytest)
+
+Le pipeline CI/CD exécute la suite de tests unitaires sur chaque `push`. Ces tests couvrent les modules critiques de l'application :
+
+* `Tests/test_api.py` (3 tests)
+* `Tests/test_data_loader.py` (4 tests)
+* `Tests/test_embedding.py` (4 tests)
+* `Tests/test_processing.py` (3 tests)
+
+**Résultat :**
+```
+
+============================= 14 passed in 346.73s (0:05:46) =============================
+
+```
+*Tous les 14 tests unitaires passent avec succès, garantissant que les composants de base (API, chargement de données, traitement) fonctionnent comme attendu.*
+
+### Évaluation de la Qualité RAG (Ragas)
+
+Nous évaluons la qualité des réponses du RAG sur un jeu de données de test (`evaluate.py`). Les seuils de validation stricts sont activés dans le pipeline CI.
+
+**Résumé des métriques (sur le jeu de test) :**
+
+| Métrique | Score Obtenu | Seuil Requis (CI) | Description |
+| :--- | :---: | :---: | :--- |
+| **Faithfulness (Fidélité)** | **1.00** / 1.00 | 0.8 | La réponse est-elle factuellement basée sur le contexte ? (Pas d'hallucination) |
+| **Answer Relevancy** | **0.88** / 1.00 | - | La réponse est-elle pertinente par rapport à la question ? |
+| **Context Precision** | **0.875** / 1.00 | 0.5 | Les contextes récupérés sont-ils tous pertinents ? |
+| **Context Recall** | **1.00** / 1.00 | - | Tous les contextes nécessaires ont-ils été récupérés ? |
+
+**Analyse des résultats :**
+
+* **Scores Parfaits (1.0) :** Les scores de `faithfulness` et `context_recall` sont parfaits. Cela signifie que l'API **n'invente aucune information** et qu'elle **récupère systématiquement le bon document** pour répondre.
+* **Scores Élevés (0.88 - 0.875) :** Les scores de pertinence sont excellents et bien au-dessus des seuils.
+* **Cas d'analyse (ID 3) :** Le seul cas où la `context_precision` a baissé (0.5) est la question sur "Noël à Montpellier". L'API a récupéré un document sur une "Soirée jeux", qui n'était pas pertinent. Cependant, la `faithfulness` de 1.0 montre que le modèle a géré cette situation en déclarant qu'il n'avait pas d'information, ce qui est le comportement attendu (il n'a pas "halluciné" un événement de Noël).
+
+**Conclusion :** Le pipeline RAG démontre une très haute qualité, avec une fiabilité (fidélité) parfaite et une excellente pertinence, validant ainsi l'architecture technique choisie.

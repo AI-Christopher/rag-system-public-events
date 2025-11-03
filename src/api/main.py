@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, status
 from .schemas import QueryRequest, QueryResponse, RebuildResponse
 
 # Ajoute le chemin racine pour importer 'src.core'
@@ -15,14 +15,40 @@ except Exception as e:
     print(f"ERREUR CRITIQUE au démarrage : {e}")
     rag_service = None
 
+# Ajout de 'tags_metadata' pour organiser l'API Swagger
+tags_metadata = [
+    {
+        "name": "Système RAG",
+        "description": "Points de terminaison pour interroger le RAG.",
+    },
+    {
+        "name": "Administration",
+        "description": "Opérations de maintenance de l'index.",
+    },
+]
 
 app = FastAPI(
     title="API pour le RAG d'événements",
     description="Permet de poser des questions et de gérer l'index vectoriel.",
-    version="1.0.0"
+    version="1.0.0",
+    openapi_tags=tags_metadata
 )
 
-@app.post("/ask", response_model=QueryResponse)
+@app.post(
+    "/ask", 
+    response_model=QueryResponse,
+    tags=["Système RAG"],  # Regroupe cet endpoint
+    summary="Interroger le système RAG",
+    description=(
+        "Pose une question en langage naturel au système RAG. "
+        "Le système trouvera les documents pertinents dans la base vectorielle "
+        "et utilisera un LLM (MistralAI) pour générer une réponse."
+    ),
+    responses={
+        400: {"description": "La question fournie est vide."},
+        503: {"description": "Le service RAG n'a pas pu être initialisé (ex: modèle non trouvé)."}
+    }
+)
 async def ask_question(query: QueryRequest):
     """
     Pose une question au système RAG et obtient une réponse augmentée.
@@ -37,7 +63,22 @@ async def ask_question(query: QueryRequest):
     return QueryResponse(answer=answer)
 
 
-@app.post("/rebuild", response_model=RebuildResponse)
+@app.post(
+    "/rebuild", 
+    response_model=RebuildResponse,
+    tags=["Administration"], # Regroupe cet endpoint
+    summary="Lancer la reconstruction de l'index",
+    description=(
+        "Déclenche une reconstruction complète de l'index vectoriel FAISS. "
+        "Il s'agit d'une **opération longue** (plusieurs minutes) qui s'exécute en arrière-plan. "
+        "L'API répond immédiatement pour confirmer que la tâche est lancée."
+    ),
+    # Utilise 202 "Accepté" pour indiquer une tâche de fond
+    status_code=status.HTTP_202_ACCEPTED, 
+    responses={
+        503: {"description": "Le service RAG n'a pas pu être initialisé."}
+    }
+)
 async def rebuild_vector_index(background_tasks: BackgroundTasks):
     """
     Lance la reconstruction complète de l'index vectoriel FAISS.

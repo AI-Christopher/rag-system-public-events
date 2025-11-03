@@ -6,7 +6,7 @@ def create_faiss_index_from_vectors(
         vectors: list[list[float]], 
         metadatas: list[dict],
         embedding_model, 
-        index_path: str = "faiss_index"
+        index_path: str = "data/faiss_index"
     ):
     """Crée un index FAISS à partir de textes et de vecteurs DÉJÀ CALCULÉS."""
     
