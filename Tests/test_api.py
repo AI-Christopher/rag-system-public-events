@@ -45,7 +45,7 @@ def test_rebuild_endpoint():
     response = client.post("/rebuild")
     
     # 4. Les assertions restent les mêmes
-    assert response.status_code == 200
+    assert response.status_code == 202
     data = response.json()
     assert data["status"] == "ok"
     assert "La reconstruction de l'index a été lancée" in data["message"]
